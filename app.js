@@ -18,7 +18,7 @@ app.post('/create-checkout-session', async (req, res) => {
         // Créez le JWT (JSON Web Token) avec les données reçues dans la requête
         const jwtPayload = req.body;
         const jwtToken = jwt.sign(jwtPayload, 'votre_clé_secrète_JWT');
-
+        const encodedJwt = encodeURIComponent(jwtToken);
         const session = await stripe.checkout.sessions.create({
             submit_type: "pay",
             payment_method_types: ["card"],
@@ -36,9 +36,8 @@ app.post('/create-checkout-session', async (req, res) => {
                 }
             ],
             mode: 'payment',
-            success_url: `http://localhost:4242/transaction-validee?transaction_id={CHECKOUT_SESSION_ID}&jwt
-                =${jwtToken}`,
-            cancel_url: 'http://localhost:4242/cancel.html',
+            success_url: `http://localhost:4200/transaction-validee?transaction_id={CHECKOUT_SESSION_ID}&jwt=${encodedJwt}`,
+            cancel_url: 'http://localhost:4200/cancel.html',
             payment_intent_data: {
                 capture_method: 'manual',
                 setup_future_usage: 'off_session',
